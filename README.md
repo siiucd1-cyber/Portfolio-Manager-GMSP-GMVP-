@@ -67,6 +67,26 @@ QQQ GLD STAR50
 CSI300 Gold Nasdaq
 ```
 
+## Asset Input Guidance
+
+Asset recognition is based on ticker codes and a limited alias list. It is not a full fuzzy-search engine for every common market nickname.
+
+For best results, enter complete and valid tickers or index symbols supported by yfinance, or complete A-share/fund codes. Common examples:
+
+```text
+S&P 500 / 标普500: ^GSPC
+Nasdaq 100 / 纳斯达克100: QQQ
+Nikkei 225 / 日经225: ^N225
+KOSPI / 韩国综合指数: ^KS11
+Gold ETF / 黄金ETF: GLD
+Silver ETF / 白银ETF: SLV
+Copper ETF / 铜ETF: CPER
+CSI300 ETF / 沪深300ETF: 510300.SS
+STAR50 ETF / 科创50ETF: 588000.SS
+```
+
+Some common aliases are supported, but if an asset is not recognized or fails to download, use the official ticker directly. For example, use `^GSPC` instead of relying only on `标普500`, and use `^N225` for Nikkei 225.
+
 ## Deployment
 
 Recommended deployment:
