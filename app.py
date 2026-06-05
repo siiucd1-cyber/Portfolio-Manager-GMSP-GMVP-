@@ -18,11 +18,10 @@ from data_loader import download_benchmark, download_prices, load_asset_info
 from portfolio_engine import calculate_return_attribution, optimize_portfolio, run_backtest
 from ui_components import render_dark_table
 
-APP_BUILD = "asset-fallback-20260605"
-
-
 def parse_asset_inputs(raw_assets):
     cleaned = re.sub(r"\s+(and|or)\s+", " ", raw_assets, flags=re.IGNORECASE)
+    cleaned = re.sub(r"(?i)\bnikkei\s+225\b", "nikkei225", cleaned)
+    cleaned = re.sub(r"日经\s*225", "日经225", cleaned)
     cleaned = re.sub(r"\s*[和与、]\s*", " ", cleaned)
     cleaned = re.sub(r"[,，;；\n\r\t]+", " ", cleaned)
     return [asset.strip() for asset in cleaned.split() if asset.strip()]
@@ -290,7 +289,7 @@ with col_title:
     st.markdown(
         '<p class="app-title">GMVP · Portfolio Optimizer'
         '<span class="title-badge">A-Share + Global</span></p>'
-        f'<p class="app-subtitle">Portfolio Optimization and Backtesting / 组合优化与回测工具 · {APP_BUILD}</p>',
+        '<p class="app-subtitle">Portfolio Optimization and Backtesting / 组合优化与回测工具</p>',
         unsafe_allow_html=True,
     )
 
@@ -365,10 +364,7 @@ if run_button:
         asset_info = load_asset_info()
         code_to_name = build_code_to_name(asset_info)
 
-    tickers, recognition_df, candidates_df = recognize_assets(asset_inputs, asset_info, code_to_name)
-
-    with st.expander("Asset Recognition / 资产识别", expanded=True):
-        render_dark_table(recognition_df)
+    tickers, _, _ = recognize_assets(asset_inputs, asset_info, code_to_name)
 
     with st.spinner("Downloading prices and optimizing / 下载价格并优化..."):
         prices, correlation_prices, failed_assets = download_prices(tickers, start_date.strftime("%Y-%m-%d"))
