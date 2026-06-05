@@ -290,6 +290,71 @@ def plotly_frontier(mu, cov, bounds, performance):
     return fig
 
 
+def plotly_leverage_curve(leverage_table, recommended_leverage):
+    fig = go.Figure()
+    x_values = leverage_table["Leverage / 杠杆"]
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_values,
+            y=leverage_table["Annual Return / 年化收益"] * 100,
+            mode="lines",
+            name="Annual Return / 年化收益",
+            line=dict(color="#4ADE80", width=2.8),
+            hovertemplate="Leverage: %{x:.2f}x<br>Return: %{y:.2f}%<extra></extra>",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_values,
+            y=leverage_table["Volatility / 波动率"] * 100,
+            mode="lines",
+            name="Volatility / 波动率",
+            line=dict(color="#60A5FA", width=2.6),
+            hovertemplate="Leverage: %{x:.2f}x<br>Volatility: %{y:.2f}%<extra></extra>",
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=x_values,
+            y=leverage_table["Max Drawdown / 最大回撤"].abs() * 100,
+            mode="lines",
+            name="Max Drawdown / 最大回撤",
+            line=dict(color="#F87171", width=2.6),
+            hovertemplate="Leverage: %{x:.2f}x<br>Max Drawdown: %{y:.2f}%<extra></extra>",
+        )
+    )
+
+    if recommended_leverage is not None:
+        fig.add_vline(
+            x=float(recommended_leverage),
+            line=dict(color="#F59E0B", width=2.4, dash="dash"),
+            annotation_text=f"Optimal / 最优 {recommended_leverage:.2f}x",
+            annotation_position="top right",
+            annotation_font=dict(color="#FDE68A", size=12),
+        )
+
+    fig.update_layout(
+        **PLOTLY_LAYOUT,
+        title=dict(text="Leverage Advisor / 杠杆建议模型", font=dict(size=14, color="#FFFFFF"), x=0.01),
+        xaxis=dict(title="Leverage Multiple / 杠杆倍数", ticksuffix="x", gridcolor="#334155"),
+        yaxis=dict(title="Annualized Metric (%) / 年化指标 (%)", ticksuffix="%", gridcolor="#334155"),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="left",
+            x=0,
+            font=dict(size=12, color="#F8FAFC"),
+            bgcolor="rgba(15,17,23,0.75)",
+        ),
+        hovermode="x unified",
+        height=430,
+        margin=dict(l=55, r=35, t=85, b=45),
+    )
+    return fig
+
+
 def align_nav_to_portfolio(portfolio_nav, benchmark_nav):
     bench = benchmark_nav.squeeze()
     if isinstance(bench, pd.DataFrame):

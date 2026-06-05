@@ -20,6 +20,7 @@ GMVP_Ashare is a portfolio construction tool, not a robo-advisor. Users choose t
 - Correlation matrix
 - Monte Carlo simulation and efficient frontier
 - Backtest vs CSI300 and S&P 500
+- Optional leverage advisor with short-rate cash proxy selection, financing-cost input, advanced Kelly/risk controls, and utility-based recommendation
 
 ## Project Philosophy
 
@@ -29,6 +30,8 @@ User selects assets
 System recognizes assets
 ↓
 System optimizes weights
+↓
+System estimates suitable leverage
 ↓
 System explains portfolio behavior
 ```

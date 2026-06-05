@@ -22,6 +22,34 @@ FALLBACK_ASSET_ROWS = [
     {"代码": "512480", "名称": "半导体ETF"},
 ]
 
+CASH_RATE_PROXIES = {
+    "United States 13W T-Bill / 美国13周短债": {
+        "symbol": "^IRX",
+        "fallback_rate": 0.045,
+        "source": "Yahoo Finance ^IRX",
+    },
+    "China 1Y deposit/short-rate proxy / 中国1年期存款/短端利率代理": {
+        "symbol": None,
+        "fallback_rate": 0.015,
+        "source": "Fallback short-rate assumption / 短端利率默认假设",
+    },
+    "Eurozone short-rate proxy / 欧元区短端利率代理": {
+        "symbol": None,
+        "fallback_rate": 0.025,
+        "source": "Fallback short-rate assumption / 短端利率默认假设",
+    },
+    "United Kingdom short-rate proxy / 英国短端利率代理": {
+        "symbol": None,
+        "fallback_rate": 0.04,
+        "source": "Fallback short-rate assumption / 短端利率默认假设",
+    },
+    "Japan short-rate proxy / 日本短端利率代理": {
+        "symbol": None,
+        "fallback_rate": 0.005,
+        "source": "Fallback short-rate assumption / 短端利率默认假设",
+    },
+}
+
 
 def fallback_asset_info():
     return pd.DataFrame(FALLBACK_ASSET_ROWS, columns=["代码", "名称"])
@@ -123,3 +151,35 @@ def download_benchmark(ticker, start_date):
 
     returns = prices.ffill().bfill().pct_change().dropna()
     return (1 + returns).cumprod()
+
+
+@st.cache_data(ttl=60 * 60 * 6)
+def fetch_cash_rate(market_label):
+    """Fetch a market cash-rate proxy from Yahoo Finance.
+
+    Yahoo yield tickers quote percentage points, so 5.20 means 5.20%
+    annualized. Markets without a dependable Yahoo yield ticker use an
+    explicit fallback assumption and are meant to be overridden when needed.
+    """
+    proxy = CASH_RATE_PROXIES.get(market_label, {})
+    symbol = proxy.get("symbol")
+    fallback_rate = proxy.get("fallback_rate", 0.02)
+    fallback_source = proxy.get("source", "Fallback / 默认现金收益")
+
+    if symbol is None:
+        return fallback_rate, fallback_source, False
+
+    try:
+        data = yf.download(
+            symbol,
+            period="10d",
+            auto_adjust=False,
+            progress=False,
+        )["Close"].dropna()
+        if isinstance(data, pd.DataFrame):
+            data = data.iloc[:, 0]
+        if not data.empty:
+            return float(data.iloc[-1]) / 100, f"Yahoo Finance {symbol}", True
+    except Exception:
+        pass
+    return fallback_rate, f"{fallback_source} ({symbol} unavailable)", False
