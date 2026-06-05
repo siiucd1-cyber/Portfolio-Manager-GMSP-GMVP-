@@ -205,59 +205,27 @@ st.markdown("""
     color: #FFFFFF !important;
   }
 
-  div[data-baseweb="popover"],
-  div[data-baseweb="popover"] > div,
-  ul[data-testid="stSelectboxVirtualDropdown"],
-  [data-baseweb="menu"],
-  [role="listbox"] {
+  .stSelectbox [data-baseweb="select"] {
     background: #0F1117 !important;
-    border: 1px solid #2D3748 !important;
-    border-radius: 8px !important;
-    color: #F8FAFC !important;
-    box-shadow: 0 18px 42px rgba(0,0,0,0.45) !important;
   }
-  [data-baseweb="menu"] *,
-  [role="listbox"] *,
-  ul[data-testid="stSelectboxVirtualDropdown"] * {
-    color: #F8FAFC !important;
+
+  div[data-baseweb="popover"] [role="option"] [data-testid="stTooltipHoverTarget"],
+  div[data-baseweb="popover"] [role="option"] [data-testid="stTooltipHoverTarget"] * {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
   }
-  [role="option"],
-  [data-baseweb="menu"] li {
-    background: #0F1117 !important;
-    color: #F8FAFC !important;
-    -webkit-text-fill-color: #F8FAFC !important;
-    align-items: center !important;
-    min-height: 40px !important;
-    padding: 8px 12px !important;
+  div[data-baseweb="popover"] [role="option"] [data-testid="stTooltipHoverTarget"] {
+    width: auto !important;
+    height: auto !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    line-height: normal !important;
   }
-  [role="option"]:hover,
-  [role="option"][aria-selected="true"],
-  [data-baseweb="menu"] li:hover {
-    background: #1E293B !important;
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
-  }
-  div[data-baseweb="popover"] [role="option"] > div,
-  div[data-baseweb="popover"] [role="option"] span,
-  div[data-baseweb="popover"] [role="option"] p,
-  div[data-baseweb="popover"] [role="option"] div {
-    color: #F8FAFC !important;
-    -webkit-text-fill-color: #F8FAFC !important;
-    opacity: 1 !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    line-height: 1.25 !important;
-  }
-  div[data-baseweb="popover"] [role="option"]:hover > div,
-  div[data-baseweb="popover"] [role="option"]:hover span,
-  div[data-baseweb="popover"] [role="option"]:hover p,
-  div[data-baseweb="popover"] [role="option"]:hover div,
-  div[data-baseweb="popover"] [role="option"][aria-selected="true"] > div,
-  div[data-baseweb="popover"] [role="option"][aria-selected="true"] span,
-  div[data-baseweb="popover"] [role="option"][aria-selected="true"] p,
-  div[data-baseweb="popover"] [role="option"][aria-selected="true"] div {
-    color: #FFFFFF !important;
-    -webkit-text-fill-color: #FFFFFF !important;
+  div[data-baseweb="popover"] [role="option"] [data-testid="stTooltipHoverTarget"]::after {
+    content: none !important;
+    display: none !important;
   }
 
   .stDateInput > div > div > input {
