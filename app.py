@@ -125,7 +125,8 @@ st.markdown("""
   .stButton > button:hover { opacity: 0.88 !important; }
 
   .stTextInput > div > div > input,
-  .stNumberInput > div > div > input {
+  .stNumberInput > div > div > input,
+  .stTextArea textarea {
     background: #0F1117 !important;
     border: 1px solid #2D3748 !important;
     border-radius: 8px !important;
@@ -134,7 +135,8 @@ st.markdown("""
     font-size: 14px !important;
   }
   .stTextInput > div > div > input:focus,
-  .stNumberInput > div > div > input:focus {
+  .stNumberInput > div > div > input:focus,
+  .stTextArea textarea:focus {
     border-color: #3B82F6 !important;
     box-shadow: 0 0 0 2px rgba(59,130,246,0.2) !important;
   }
@@ -209,7 +211,7 @@ st.markdown("""
 
   /* Labels */
   label, .stSelectbox label, .stDateInput label,
-  .stNumberInput label, .stTextInput label {
+  .stNumberInput label, .stTextInput label, .stTextArea label {
     color: #E5E7EB !important;
     font-size: 12px !important;
     font-weight: 500 !important;
@@ -285,34 +287,54 @@ st.markdown("---")
 # ─────────────────────────────────────────────
 # UI — INPUTS (TOP)
 # ─────────────────────────────────────────────
+if "asset_input" not in st.session_state:
+    st.session_state.asset_input = "QQQ GLD STAR50"
+
 st.markdown('<p class="section-header">📥 Parameters / 参数设置</p>', unsafe_allow_html=True)
 
 row1_c1, row1_c2, row1_c3 = st.columns([3, 1.5, 1.5])
 with row1_c1:
-    raw_assets = st.text_input(
+    raw_assets = st.text_area(
         "Assets / 资产",
-        value="QQQ GLD STAR50",
+        key="asset_input",
         help="Space-separated. Examples: QQQ GLD STAR50 黄金 纳斯达克 科创100",
+        height=72,
     )
 with row1_c2:
-    capital = st.number_input("Investment Amount / 投资金额", min_value=1000.0, value=100000.0, step=1000.0)
+    capital = st.number_input(
+        "Investment Amount / 投资金额",
+        min_value=1000.0,
+        value=100000.0,
+        step=1000.0,
+        key="capital_input",
+    )
 with row1_c3:
-    start_date = st.date_input("Start Date / 起始日期", value=pd.to_datetime("2025-01-01"))
+    start_date = st.date_input(
+        "Start Date / 起始日期",
+        value=pd.to_datetime("2025-01-01"),
+        key="start_date_input",
+    )
 
 row2_c1, row2_c2, row2_c3, row2_c4 = st.columns([2.4, 1.8, 1.8, 2.2])
 with row2_c1:
     objective = st.selectbox(
         "Optimization Objective / 优化目标",
         ["Maximum Sharpe / 最大夏普比率", "Minimum Volatility / 最小波动", "Maximum Return / 最大收益"],
+        key="objective_input",
     )
 with row2_c2:
     rebalance_option = st.selectbox(
         "Rebalancing / 再平衡",
         ["None / 不再平衡", "Monthly / 每月", "Quarterly / 每季度", "Yearly / 每年"],
+        key="rebalance_input",
     )
 with row2_c3:
     st.markdown("<div style='margin-top:28px'>", unsafe_allow_html=True)
-    allow_short = st.toggle("Short Selling / 做空", value=False)
+    allow_short = st.toggle(
+        "Short Selling / 做空",
+        value=False,
+        key="short_input",
+    )
     st.markdown("</div>", unsafe_allow_html=True)
 with row2_c4:
     st.markdown("<div style='margin-top:20px'>", unsafe_allow_html=True)
@@ -468,4 +490,3 @@ else:
         """,
         unsafe_allow_html=True,
     )
-
