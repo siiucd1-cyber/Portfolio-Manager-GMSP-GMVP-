@@ -1,4 +1,4 @@
-# Portfolio Manager
+# Portfolio Optimizer
 
 Bilingual portfolio optimization and backtesting web app for user-selected assets.
 
