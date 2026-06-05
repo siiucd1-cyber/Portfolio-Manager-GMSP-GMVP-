@@ -226,7 +226,6 @@ st.markdown("""
     background: #0F1117 !important;
     color: #F8FAFC !important;
     -webkit-text-fill-color: #F8FAFC !important;
-    display: flex !important;
     align-items: center !important;
     min-height: 40px !important;
     padding: 8px 12px !important;
@@ -238,22 +237,25 @@ st.markdown("""
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
   }
-  div[data-baseweb="popover"] [role="option"]::after {
-    content: attr(aria-label) !important;
+  div[data-baseweb="popover"] [role="option"] > div,
+  div[data-baseweb="popover"] [role="option"] span,
+  div[data-baseweb="popover"] [role="option"] p,
+  div[data-baseweb="popover"] [role="option"] div {
     color: #F8FAFC !important;
     -webkit-text-fill-color: #F8FAFC !important;
-    display: block !important;
-    margin-left: 8px !important;
     opacity: 1 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
     font-size: 14px !important;
     font-weight: 500 !important;
     line-height: 1.25 !important;
   }
-  div[data-baseweb="popover"] [role="option"]:hover::after,
-  div[data-baseweb="popover"] [role="option"][aria-selected="true"]::after {
+  div[data-baseweb="popover"] [role="option"]:hover > div,
+  div[data-baseweb="popover"] [role="option"]:hover span,
+  div[data-baseweb="popover"] [role="option"]:hover p,
+  div[data-baseweb="popover"] [role="option"]:hover div,
+  div[data-baseweb="popover"] [role="option"][aria-selected="true"] > div,
+  div[data-baseweb="popover"] [role="option"][aria-selected="true"] span,
+  div[data-baseweb="popover"] [role="option"][aria-selected="true"] p,
+  div[data-baseweb="popover"] [role="option"][aria-selected="true"] div {
     color: #FFFFFF !important;
     -webkit-text-fill-color: #FFFFFF !important;
   }
