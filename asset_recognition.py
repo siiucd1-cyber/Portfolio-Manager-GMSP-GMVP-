@@ -1,41 +1,8 @@
 """Asset recognition and display-name helpers."""
 
-import difflib
-import re
-
 import pandas as pd
 
 from config import ALIAS_CN, ALIAS_EN, CONCEPT_MAP, DISPLAY_NAMES
-
-
-def normalize_search_text(text):
-    return re.sub(r"[^a-z0-9]", "", str(text).lower())
-
-
-def match_alias(search_text):
-    lower = str(search_text).lower().strip()
-    if lower in ALIAS_CN:
-        return ALIAS_CN[lower], "Alias / 别名"
-    if lower in ALIAS_EN:
-        return ALIAS_EN[lower], "Alias / 别名"
-
-    normalized_aliases = {
-        normalize_search_text(alias): ticker for alias, ticker in ALIAS_EN.items()
-    }
-    normalized = normalize_search_text(lower)
-    if normalized in normalized_aliases:
-        return normalized_aliases[normalized], "Alias / 别名"
-
-    fuzzy_matches = difflib.get_close_matches(
-        normalized,
-        normalized_aliases.keys(),
-        n=1,
-        cutoff=0.78,
-    )
-    if fuzzy_matches:
-        return normalized_aliases[fuzzy_matches[0]], "Fuzzy Alias / 模糊别名"
-
-    return None, None
 
 
 def code_to_ticker(code):
@@ -132,9 +99,14 @@ def recognize_assets(inputs, asset_info, code_to_name):
         method = None
         search_item = item
 
-        ticker, method = match_alias(item)
-        if ticker is not None:
+        if lower in ALIAS_CN:
+            ticker = ALIAS_CN[lower]
             matched_name = ticker_to_display_name(ticker, code_to_name)
+            method = "Alias / 别名"
+        elif lower in ALIAS_EN:
+            ticker = ALIAS_EN[lower]
+            matched_name = ticker_to_display_name(ticker, code_to_name)
+            method = "Alias / 别名"
 
         for key, value in CONCEPT_MAP.items():
             if key in lower:
