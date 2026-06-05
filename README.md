@@ -4,6 +4,12 @@ Bilingual portfolio optimization and backtesting web app for user-selected asset
 
 GMVP_Ashare is a portfolio construction tool, not a robo-advisor. Users choose the assets; the system recognizes them, downloads market data, optimizes portfolio weights, and explains portfolio behavior.
 
+## Keywords / 关键词
+
+Investment, portfolio management, portfolio optimization, Markowitz model, Modern Portfolio Theory, GMVP, global minimum variance portfolio, efficient frontier, maximum Sharpe ratio, backtesting, asset allocation, quantitative finance, leverage advisor.
+
+投资、投资组合管理、投资组合优化、马科维茨模型、现代投资组合理论、全局最小方差组合、有效前沿、最大夏普比率、回测、资产配置、量化金融、杠杆建议模型。
+
 ## Features
 
 - Bilingual interface: English / 中文
