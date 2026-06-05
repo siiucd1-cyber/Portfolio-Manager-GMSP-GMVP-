@@ -421,6 +421,17 @@ if run_button:
     with alloc_col:
         st.plotly_chart(plotly_allocation_pie(weights, code_to_name), use_container_width=True)
 
+        zero_weight_assets = [
+            ticker_to_display_name(asset, code_to_name)
+            for asset in prices.columns
+            if abs(weights.get(asset, 0)) <= 0.001
+        ]
+        if zero_weight_assets:
+            st.info(
+                "Optimized to 0% weight / 优化后权重为 0%: "
+                + ", ".join(zero_weight_assets)
+            )
+
         weights_table = pd.DataFrame({
             "Asset / 资产": [ticker_to_display_name(a, code_to_name) for a in prices.columns],
             "Ticker": prices.columns,
