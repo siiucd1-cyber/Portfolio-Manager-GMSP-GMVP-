@@ -145,14 +145,17 @@ display_names={
     "SLV":
         "Silver ETF / 白银ETF",
 
-    "XAGUSD=X":
-        "Silver Spot / 现货白银",
+    "SI=F":
+        "Silver Futures / 白银期货",
 
     "USO":
         "Oil ETF / 原油ETF",
 
     "CPER":
         "Copper ETF / 铜ETF",
+
+    "HG=F":
+        "Copper Futures / 铜期货",
 
     "^KS11":
         "KOSPI / 韩国综合指数",
@@ -202,14 +205,20 @@ alias_en={
     "silver":"SLV",
     "sliver":"SLV",
     "slv":"SLV",
-    "xag":"XAGUSD=X",
-    "xagusd":"XAGUSD=X",
-    "xag/usd":"XAGUSD=X",
+    "xag":"SI=F",
+    "xagusd":"SI=F",
+    "xag/usd":"SI=F",
+    "silver futures":"SI=F",
     "kospi":"^KS11",
     "ks11":"^KS11",
 
     "oil":"USO",
-    "uso":"USO"
+    "uso":"USO",
+
+    "copper":"CPER",
+    "copper etf":"CPER",
+    "cper":"CPER",
+    "copper futures":"HG=F"
 }
 
 fallback_map={
