@@ -1,4 +1,4 @@
-# GMVP_Ashare
+# Portfolio Manager
 
 Bilingual portfolio optimization and backtesting web app for user-selected assets.
 
