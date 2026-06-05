@@ -21,6 +21,11 @@ from ui_components import render_dark_table
 def parse_asset_inputs(raw_assets):
     cleaned = re.sub(r"\s+(and|or)\s+", " ", raw_assets, flags=re.IGNORECASE)
     cleaned = re.sub(r"(?i)\bnikkei\s+225\b", "nikkei225", cleaned)
+    cleaned = re.sub(r"(?i)\bs\s*&\s*p\s*500\b", "sp500", cleaned)
+    cleaned = re.sub(r"(?i)\bs\s*&\s*p\b", "sp500", cleaned)
+    cleaned = re.sub(r"(?i)\bsp\s+500\b", "sp500", cleaned)
+    cleaned = re.sub(r"标普\s*500", "标普500", cleaned)
+    cleaned = re.sub(r"标准普尔\s*500", "标准普尔500", cleaned)
     cleaned = re.sub(r"日经\s*225", "日经225", cleaned)
     cleaned = re.sub(r"\s*[和与、]\s*", " ", cleaned)
     cleaned = re.sub(r"[,，;；\n\r\t]+", " ", cleaned)
