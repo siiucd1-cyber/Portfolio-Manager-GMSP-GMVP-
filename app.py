@@ -225,12 +225,37 @@ st.markdown("""
   [data-baseweb="menu"] li {
     background: #0F1117 !important;
     color: #F8FAFC !important;
+    -webkit-text-fill-color: #F8FAFC !important;
+    display: flex !important;
+    align-items: center !important;
+    min-height: 40px !important;
+    padding: 8px 12px !important;
   }
   [role="option"]:hover,
   [role="option"][aria-selected="true"],
   [data-baseweb="menu"] li:hover {
     background: #1E293B !important;
     color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
+  }
+  div[data-baseweb="popover"] [role="option"]::after {
+    content: attr(aria-label) !important;
+    color: #F8FAFC !important;
+    -webkit-text-fill-color: #F8FAFC !important;
+    display: block !important;
+    margin-left: 8px !important;
+    opacity: 1 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.25 !important;
+  }
+  div[data-baseweb="popover"] [role="option"]:hover::after,
+  div[data-baseweb="popover"] [role="option"][aria-selected="true"]::after {
+    color: #FFFFFF !important;
+    -webkit-text-fill-color: #FFFFFF !important;
   }
 
   .stDateInput > div > div > input {
