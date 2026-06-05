@@ -145,11 +145,17 @@ display_names={
     "SLV":
         "Silver ETF / 白银ETF",
 
+    "XAGUSD=X":
+        "Silver Spot / 现货白银",
+
     "USO":
         "Oil ETF / 原油ETF",
 
     "CPER":
         "Copper ETF / 铜ETF",
+
+    "^KS11":
+        "KOSPI / 韩国综合指数",
 
     "513100.SS":
         "Nasdaq ETF / 纳指ETF",
@@ -194,7 +200,13 @@ alias_en={
     "gld":"GLD",
 
     "silver":"SLV",
+    "sliver":"SLV",
     "slv":"SLV",
+    "xag":"XAGUSD=X",
+    "xagusd":"XAGUSD=X",
+    "xag/usd":"XAGUSD=X",
+    "kospi":"^KS11",
+    "ks11":"^KS11",
 
     "oil":"USO",
     "uso":"USO"
