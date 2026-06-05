@@ -205,6 +205,34 @@ st.markdown("""
     color: #FFFFFF !important;
   }
 
+  div[data-baseweb="popover"],
+  div[data-baseweb="popover"] > div,
+  ul[data-testid="stSelectboxVirtualDropdown"],
+  [data-baseweb="menu"],
+  [role="listbox"] {
+    background: #0F1117 !important;
+    border: 1px solid #2D3748 !important;
+    border-radius: 8px !important;
+    color: #F8FAFC !important;
+    box-shadow: 0 18px 42px rgba(0,0,0,0.45) !important;
+  }
+  [data-baseweb="menu"] *,
+  [role="listbox"] *,
+  ul[data-testid="stSelectboxVirtualDropdown"] * {
+    color: #F8FAFC !important;
+  }
+  [role="option"],
+  [data-baseweb="menu"] li {
+    background: #0F1117 !important;
+    color: #F8FAFC !important;
+  }
+  [role="option"]:hover,
+  [role="option"][aria-selected="true"],
+  [data-baseweb="menu"] li:hover {
+    background: #1E293B !important;
+    color: #FFFFFF !important;
+  }
+
   .stDateInput > div > div > input {
     background: #0F1117 !important;
     border: 1px solid #2D3748 !important;
