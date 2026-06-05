@@ -1,5 +1,3 @@
-import re
-
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -17,16 +15,6 @@ from config import REBALANCE_LABEL_MAP, REBALANCE_MAP
 from data_loader import download_benchmark, download_prices, load_asset_info
 from portfolio_engine import calculate_return_attribution, optimize_portfolio, run_backtest
 from ui_components import render_dark_table
-
-APP_BUILD = "fuzzy-assets-20260605"
-
-
-def parse_asset_inputs(raw_assets):
-    cleaned = re.sub(r"\s+(and|or)\s+", " ", raw_assets, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\s*[和与、]\s*", " ", cleaned)
-    cleaned = re.sub(r"[,，;；\n\r\t]+", " ", cleaned)
-    return [asset.strip() for asset in cleaned.split() if asset.strip()]
-
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG & CUSTOM CSS
@@ -290,7 +278,7 @@ with col_title:
     st.markdown(
         '<p class="app-title">GMVP · Portfolio Optimizer'
         '<span class="title-badge">A-Share + Global</span></p>'
-        f'<p class="app-subtitle">Portfolio Optimization and Backtesting / 组合优化与回测工具 · {APP_BUILD}</p>',
+        '<p class="app-subtitle">Portfolio Optimization and Backtesting / 组合优化与回测工具</p>',
         unsafe_allow_html=True,
     )
 
@@ -357,7 +345,7 @@ with row2_c4:
 # UI — RESULTS
 # ─────────────────────────────────────────────
 if run_button:
-    asset_inputs = parse_asset_inputs(raw_assets)
+    asset_inputs = [a for a in raw_assets.split() if a.strip()]
     bounds = (-1, 1) if allow_short else (0, 1)
     rebalance_freq = REBALANCE_MAP[rebalance_option]
 
@@ -366,9 +354,6 @@ if run_button:
         code_to_name = build_code_to_name(asset_info)
 
     tickers, recognition_df, candidates_df = recognize_assets(asset_inputs, asset_info, code_to_name)
-
-    with st.expander("Asset Recognition / 资产识别", expanded=True):
-        render_dark_table(recognition_df)
 
     with st.spinner("Downloading prices and optimizing / 下载价格并优化..."):
         prices, correlation_prices, failed_assets = download_prices(tickers, start_date.strftime("%Y-%m-%d"))
