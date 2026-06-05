@@ -16,7 +16,7 @@ Investment, portfolio management, portfolio optimization, Markowitz model, Moder
 - Chinese and global asset recognition
 - Akshare asset name database for China assets
 - yfinance historical data for global assets
-- Portfolio optimization with PyPortfolioOpt
+- Portfolio optimization with SciPy
 - Minimum volatility, maximum Sharpe, and maximum return objectives
 - Long-only and long/short portfolios
 - Rebalancing: none, monthly, quarterly, yearly
@@ -52,7 +52,7 @@ The app does not automatically recommend or select assets.
 - Plotly
 - yfinance
 - Akshare
-- PyPortfolioOpt
+- SciPy
 
 ## Run Locally
 

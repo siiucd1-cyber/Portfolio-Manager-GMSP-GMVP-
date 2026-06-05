@@ -2,23 +2,99 @@
 
 import numpy as np
 import pandas as pd
-from pypfopt import EfficientFrontier, expected_returns, risk_models
+from scipy.optimize import minimize
+
+
+TRADING_DAYS = 252
+
+
+def mean_historical_return(prices):
+    return prices.pct_change(fill_method=None).dropna(how="all").mean() * TRADING_DAYS
+
+
+def sample_cov(prices):
+    return prices.pct_change(fill_method=None).dropna(how="all").cov() * TRADING_DAYS
+
+
+def portfolio_performance_from_weights(weights_array, mu, cov):
+    ret = float(weights_array @ mu.values)
+    vol = float(np.sqrt(weights_array @ cov.values @ weights_array))
+    sharpe = ret / vol if vol > 0 else np.nan
+    return ret, vol, sharpe
+
+
+def _initial_weights(n_assets, bounds):
+    lower, upper = bounds
+    if lower <= 1 / n_assets <= upper:
+        return np.repeat(1 / n_assets, n_assets)
+
+    weights = np.repeat(lower, n_assets)
+    remaining = 1 - weights.sum()
+    capacity = upper - lower
+    for idx in range(n_assets):
+        add = min(capacity, remaining)
+        weights[idx] += add
+        remaining -= add
+        if remaining <= 1e-12:
+            break
+    return weights
+
+
+def solve_portfolio(mu, cov, objective, bounds, target_return=None):
+    n_assets = len(mu)
+    x0 = _initial_weights(n_assets, bounds)
+    constraints = [{"type": "eq", "fun": lambda weights: np.sum(weights) - 1}]
+    if target_return is not None:
+        constraints.append(
+            {"type": "eq", "fun": lambda weights: weights @ mu.values - target_return}
+        )
+
+    def volatility(weights):
+        return np.sqrt(max(weights @ cov.values @ weights, 0))
+
+    def neg_sharpe(weights):
+        vol = volatility(weights)
+        if vol <= 0:
+            return 1e6
+        return -(weights @ mu.values) / vol
+
+    def neg_return(weights):
+        return -(weights @ mu.values)
+
+    def neg_quadratic_utility(weights):
+        risk_aversion = 1.0
+        return -(weights @ mu.values - 0.5 * risk_aversion * weights @ cov.values @ weights)
+
+    if target_return is not None or objective == "Minimum Volatility / 最小波动":
+        objective_fn = volatility
+    elif objective == "Maximum Sharpe / 最大夏普比率":
+        objective_fn = neg_sharpe
+    elif objective == "Maximum Return / 最大收益":
+        objective_fn = neg_return
+    else:
+        objective_fn = neg_quadratic_utility
+
+    result = minimize(
+        objective_fn,
+        x0,
+        method="SLSQP",
+        bounds=[bounds] * n_assets,
+        constraints=constraints,
+        options={"maxiter": 1000, "ftol": 1e-10},
+    )
+    if not result.success:
+        raise ValueError(f"Portfolio optimization failed: {result.message}")
+
+    weights = np.where(np.abs(result.x) < 1e-8, 0, result.x)
+    return weights / weights.sum()
 
 
 def optimize_portfolio(prices, objective, bounds):
-    mu = expected_returns.mean_historical_return(prices)
-    cov = risk_models.sample_cov(prices)
-    ef = EfficientFrontier(mu, cov, weight_bounds=bounds)
-
-    if objective == "Minimum Volatility / 最小波动":
-        ef.min_volatility()
-    elif objective == "Maximum Sharpe / 最大夏普比率":
-        ef.max_sharpe()
-    else:
-        ef.max_quadratic_utility()
-
-    weights = ef.clean_weights()
-    performance = ef.portfolio_performance()
+    mu = mean_historical_return(prices)
+    cov = sample_cov(prices)
+    weights_array = solve_portfolio(mu, cov, objective, bounds)
+    weights = {ticker: float(weight) for ticker, weight in zip(prices.columns, weights_array)}
+    performance = portfolio_performance_from_weights(weights_array, mu, cov)
     return mu, cov, weights, performance
 
 

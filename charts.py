@@ -3,10 +3,10 @@
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from pypfopt import EfficientFrontier
 
 from asset_recognition import short_name
 from config import COLORS
+from portfolio_engine import solve_portfolio, portfolio_performance_from_weights
 
 
 PLOTLY_LAYOUT = dict(
@@ -202,17 +202,25 @@ def plotly_frontier(mu, cov, bounds, performance):
     frontier_returns = []
 
     try:
-        ef_min = EfficientFrontier(mu, cov, weight_bounds=bounds)
-        ef_min.min_volatility()
-        min_ret, _, _ = ef_min.portfolio_performance()
+        min_weights = solve_portfolio(mu, cov, "Minimum Volatility / 最小波动", bounds)
+        min_ret, _, _ = portfolio_performance_from_weights(min_weights, mu, cov)
         max_ret = float(mu.max())
 
         if max_ret > min_ret:
             for target_return in np.linspace(min_ret, max_ret * 0.995, 80):
                 try:
-                    ef_curve = EfficientFrontier(mu, cov, weight_bounds=bounds)
-                    ef_curve.efficient_return(target_return)
-                    curve_ret, curve_vol, _ = ef_curve.portfolio_performance()
+                    curve_weights = solve_portfolio(
+                        mu,
+                        cov,
+                        "Minimum Volatility / 最小波动",
+                        bounds,
+                        target_return=target_return,
+                    )
+                    curve_ret, curve_vol, _ = portfolio_performance_from_weights(
+                        curve_weights,
+                        mu,
+                        cov,
+                    )
                     frontier_returns.append(curve_ret * 100)
                     frontier_vols.append(curve_vol * 100)
                 except Exception:

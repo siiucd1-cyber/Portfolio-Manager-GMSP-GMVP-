@@ -2,9 +2,7 @@ streamlit==1.40.2
 pandas==2.2.3
 numpy==1.26.4
 scipy==1.13.1
-cvxpy==1.5.3
 matplotlib
 plotly
 yfinance
 akshare
-PyPortfolioOpt==1.5.6
