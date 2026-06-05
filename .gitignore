@@ -1,0 +1,14 @@
+.env
+__pycache__/
+*.pyc
+.DS_Store
+.streamlit/secrets.toml
+
+# Local data caches
+a_stock_cache.csv
+asset_name_cache.csv
+
+# Local virtual environments
+.venv/
+venv/
+env/
