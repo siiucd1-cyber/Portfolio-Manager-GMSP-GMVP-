@@ -26,7 +26,15 @@ Investment, portfolio management, portfolio optimization, Markowitz model, Moder
 - Correlation matrix
 - Monte Carlo simulation and efficient frontier
 - Backtest vs CSI300 and S&P 500
+- Historical VaR and CVaR risk metrics
+- 1-day 95% and 99% Value at Risk estimation
+- Expected Shortfall / Conditional VaR for tail-risk analysis
+- Leveraged VaR estimate when Leverage Advisor is enabled
 - Optional leverage advisor with short-rate cash proxy selection, financing-cost input, advanced Kelly/risk controls, and utility-based recommendation
+- 历史 VaR / CVaR 风险指标
+- 一日 95% 与 99% 风险价值估算
+- 条件风险价值 / 期望尾部损失分析
+- 启用杠杆建议后，展示杠杆后的 VaR 风险金额
 
 ## Project Philosophy
 

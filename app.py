@@ -25,9 +25,15 @@ from data_loader import (
 from leverage_model import (
     build_leverage_table,
     estimate_kelly_leverage,
+    levered_returns,
     recommend_leverage,
 )
-from portfolio_engine import calculate_return_attribution, optimize_portfolio, run_backtest
+from portfolio_engine import (
+    calculate_return_attribution,
+    calculate_var_cvar_metrics,
+    optimize_portfolio,
+    run_backtest,
+)
 from ui_components import render_dark_table
 
 def parse_asset_inputs(raw_assets):
@@ -138,6 +144,36 @@ st.markdown("""
   }
   .metric-value.positive { color: #4ADE80; }
   .metric-value.negative { color: #F87171; }
+  .risk-card {
+    min-height: 156px;
+  }
+  .risk-value-block {
+    margin-top: 12px;
+  }
+  .risk-value-block + .risk-value-block {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid #2D3748;
+  }
+  .risk-scope {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #93C5FD;
+    margin-bottom: 7px;
+  }
+  .risk-percent,
+  .risk-amount {
+    font-size: 24px;
+    font-weight: 600;
+    font-family: 'DM Mono', monospace;
+    color: #F87171;
+    line-height: 1.05;
+  }
+  .risk-amount {
+    margin-top: 8px;
+  }
 
   /* ── INPUT PANEL ── */
   .input-panel {
@@ -158,6 +194,14 @@ st.markdown("""
     margin-bottom: 16px;
     padding-bottom: 8px;
     border-bottom: 1px solid #2D3748;
+  }
+  .subsection-header {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #D7DEE8;
+    margin: 18px 0 12px 0;
   }
 
   /* ── STREAMLIT OVERRIDES ── */
@@ -708,6 +752,20 @@ if run_button:
         recommended_leverage = float(recommended_leverage_row["Leverage / 杠杆"])
         effective_capital = capital * recommended_leverage
 
+    var_cvar_levered_returns = None
+    if recommended_leverage_row is not None:
+        var_cvar_levered_returns = levered_returns(
+            portfolio_returns,
+            recommended_leverage,
+            cash_rate,
+            borrow_rate,
+        )
+    var_cvar_metrics = calculate_var_cvar_metrics(
+        portfolio_returns=portfolio_returns,
+        capital=capital,
+        leveraged_returns=var_cvar_levered_returns,
+    )
+
     # ── Metric Cards ──
     st.markdown('<p class="section-header" style="margin-top:1.5rem">📊 Portfolio Metrics / 组合指标</p>', unsafe_allow_html=True)
 
@@ -739,6 +797,75 @@ if run_button:
 
     st.markdown("<div style='margin-top:1rem'></div>", unsafe_allow_html=True)
 
+    # ── Historical VaR / CVaR ──
+    if var_cvar_metrics is not None:
+        st.markdown('<p class="section-header">📉 Risk Metrics / 风险指标</p>', unsafe_allow_html=True)
+
+        def risk_metric_card(label, scope, pct, amount):
+            return (
+                f'<div class="metric-card risk-card">'
+                f'<div class="metric-label">{label}</div>'
+                f'<div class="risk-value-block">'
+                f'<div class="risk-scope">{scope}</div>'
+                f'<div class="risk-percent">{pct:.2%}</div>'
+                f'<div class="risk-amount">¥{amount:,.0f}</div>'
+                f'</div>'
+                f'</div>'
+            )
+
+        r1, r2, r3, r4 = st.columns(4)
+        with r1:
+            st.markdown(
+                risk_metric_card(
+                    "1-Day 95% VaR<br>一日95%风险价值",
+                    "Base Portfolio / 基础组合",
+                    var_cvar_metrics["var_95"],
+                    var_cvar_metrics["var_95_amount"],
+                ),
+                unsafe_allow_html=True,
+            )
+        with r2:
+            st.markdown(
+                risk_metric_card(
+                    "1-Day 99% VaR<br>一日99%风险价值",
+                    "Base Portfolio / 基础组合",
+                    var_cvar_metrics["var_99"],
+                    var_cvar_metrics["var_99_amount"],
+                ),
+                unsafe_allow_html=True,
+            )
+        with r3:
+            st.markdown(
+                risk_metric_card(
+                    "1-Day 95% CVaR<br>一日95%条件风险价值",
+                    "Base Portfolio / 基础组合",
+                    var_cvar_metrics["cvar_95"],
+                    var_cvar_metrics["cvar_95_amount"],
+                ),
+                unsafe_allow_html=True,
+            )
+        with r4:
+            st.markdown(
+                risk_metric_card(
+                    "1-Day 99% CVaR<br>一日99%条件风险价值",
+                    "Base Portfolio / 基础组合",
+                    var_cvar_metrics["cvar_99"],
+                    var_cvar_metrics["cvar_99_amount"],
+                ),
+                unsafe_allow_html=True,
+            )
+
+        st.caption(
+            f"Sample size: {var_cvar_metrics['sample_size']} daily portfolio returns. "
+            "Historical VaR estimates the 1-day loss threshold at a selected confidence level. "
+            "CVaR, also called Expected Shortfall, estimates the average loss after returns fall beyond the VaR threshold. "
+            "These are historical risk estimates, not maximum-loss guarantees or investment advice. / "
+            f"样本数量：{var_cvar_metrics['sample_size']} 个组合日收益。"
+            "历史 VaR 用于估算指定置信水平下的一日亏损边界。CVaR 又称期望尾部损失，用于估算超过 VaR 阈值后的平均亏损。"
+            "这些指标是基于历史收益的风险估算，不代表最大亏损保证，也不构成投资建议。"
+        )
+        st.markdown("<div style='margin-top:1rem'></div>", unsafe_allow_html=True)
+
     # ── Leverage Advisor ──
     if recommended_leverage_row is not None:
         rec_return = float(recommended_leverage_row["Annual Return / 年化收益"])
@@ -755,6 +882,10 @@ if run_button:
                 "没有杠杆档位同时满足全部约束，因此展示效用最高的备选值。"
             )
 
+        st.markdown(
+            '<p class="subsection-header">Leveraged Portfolio Metrics / 杠杆后组合指标</p>',
+            unsafe_allow_html=True,
+        )
         l1, l2, l3, l4, l5, l6 = st.columns(6)
         with l1:
             st.markdown(metric_card("Recommended<br>建议杠杆", f"{recommended_leverage:.2f}x", recommended_leverage <= 1.5), unsafe_allow_html=True)
@@ -768,6 +899,54 @@ if run_button:
             st.markdown(metric_card("Levered Sharpe<br>杠杆夏普", f"{rec_sharpe:.2f}", rec_sharpe > 1), unsafe_allow_html=True)
         with l6:
             st.markdown(metric_card("Borrowed<br>融资金额", f"¥{borrowed_amount:,.0f}", borrowed_amount == 0), unsafe_allow_html=True)
+
+        if var_cvar_metrics is not None and "leveraged_var_95_amount" in var_cvar_metrics and recommended_leverage > 1.0:
+            st.markdown("<div style='margin-top:1rem'></div>", unsafe_allow_html=True)
+            st.markdown(
+                '<p class="subsection-header">Leveraged Tail Risk / 杠杆后尾部风险</p>',
+                unsafe_allow_html=True,
+            )
+            lr1, lr2, lr3, lr4 = st.columns(4)
+            with lr1:
+                st.markdown(
+                    risk_metric_card(
+                        "1-Day 95% VaR<br>一日95%风险价值",
+                        f"Leveraged {recommended_leverage:.2f}x / 杠杆后",
+                        var_cvar_metrics["leveraged_var_95"],
+                        var_cvar_metrics["leveraged_var_95_amount"],
+                    ),
+                    unsafe_allow_html=True,
+                )
+            with lr2:
+                st.markdown(
+                    risk_metric_card(
+                        "1-Day 99% VaR<br>一日99%风险价值",
+                        f"Leveraged {recommended_leverage:.2f}x / 杠杆后",
+                        var_cvar_metrics["leveraged_var_99"],
+                        var_cvar_metrics["leveraged_var_99_amount"],
+                    ),
+                    unsafe_allow_html=True,
+                )
+            with lr3:
+                st.markdown(
+                    risk_metric_card(
+                        "1-Day 95% CVaR<br>一日95%条件风险价值",
+                        f"Leveraged {recommended_leverage:.2f}x / 杠杆后",
+                        var_cvar_metrics["leveraged_cvar_95"],
+                        var_cvar_metrics["leveraged_cvar_95_amount"],
+                    ),
+                    unsafe_allow_html=True,
+                )
+            with lr4:
+                st.markdown(
+                    risk_metric_card(
+                        "1-Day 99% CVaR<br>一日99%条件风险价值",
+                        f"Leveraged {recommended_leverage:.2f}x / 杠杆后",
+                        var_cvar_metrics["leveraged_cvar_99"],
+                        var_cvar_metrics["leveraged_cvar_99_amount"],
+                    ),
+                    unsafe_allow_html=True,
+                )
 
         st.plotly_chart(
             plotly_leverage_curve(leverage_table, recommended_leverage),

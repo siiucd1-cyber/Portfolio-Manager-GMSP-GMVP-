@@ -123,6 +123,62 @@ def run_backtest(prices, weights, rebalance_freq):
     return portfolio_returns, nav, cagr, max_drawdown, calmar
 
 
+def calculate_var_cvar_metrics(portfolio_returns, capital, leveraged_returns=None, min_samples=60):
+    """Calculate 1-day historical VaR and CVaR using portfolio return samples."""
+    if portfolio_returns is None:
+        return None
+
+    returns = pd.Series(portfolio_returns).dropna()
+    if len(returns) < min_samples:
+        return None
+
+    def tail_metrics(return_series):
+        q5 = np.percentile(return_series, 5)
+        q1 = np.percentile(return_series, 1)
+        var_95 = max(0.0, -q5)
+        var_99 = max(0.0, -q1)
+
+        tail_95 = return_series[return_series <= q5]
+        tail_99 = return_series[return_series <= q1]
+        cvar_95 = max(0.0, -tail_95.mean()) if len(tail_95) else var_95
+        cvar_99 = max(0.0, -tail_99.mean()) if len(tail_99) else var_99
+        return var_95, var_99, cvar_95, cvar_99
+
+    capital = max(0.0, float(capital))
+    var_95, var_99, cvar_95, cvar_99 = tail_metrics(returns)
+
+    metrics = {
+        "var_95": var_95,
+        "var_99": var_99,
+        "cvar_95": cvar_95,
+        "cvar_99": cvar_99,
+        "var_95_amount": capital * var_95,
+        "var_99_amount": capital * var_99,
+        "cvar_95_amount": capital * cvar_95,
+        "cvar_99_amount": capital * cvar_99,
+        "sample_size": len(returns),
+    }
+
+    if leveraged_returns is not None:
+        levered = pd.Series(leveraged_returns).dropna()
+        if len(levered) >= min_samples:
+            lev_var_95, lev_var_99, lev_cvar_95, lev_cvar_99 = tail_metrics(levered)
+            metrics.update(
+                {
+                    "leveraged_var_95": lev_var_95,
+                    "leveraged_var_99": lev_var_99,
+                    "leveraged_cvar_95": lev_cvar_95,
+                    "leveraged_cvar_99": lev_cvar_99,
+                    "leveraged_var_95_amount": capital * lev_var_95,
+                    "leveraged_var_99_amount": capital * lev_var_99,
+                    "leveraged_cvar_95_amount": capital * lev_cvar_95,
+                    "leveraged_cvar_99_amount": capital * lev_cvar_99,
+                }
+            )
+
+    return metrics
+
+
 def calculate_return_attribution(prices, weights):
     asset_total_returns = prices.iloc[-1] / prices.iloc[0] - 1
     weights_series = pd.Series(weights).reindex(prices.columns).fillna(0)
